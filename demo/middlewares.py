@@ -6,6 +6,13 @@
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from demo.useragent import agents
+import  json
+import  random
+import redis
+from  scrapy.downloadermiddlewares.useragent import UserAgentMiddleware
+from scrapy.downloadermiddlewares.retry import  RetryMiddleware
+
 
 
 class DemoSpiderMiddleware(object):
@@ -31,7 +38,7 @@ class DemoSpiderMiddleware(object):
         # Called with the results returned from the Spider, after
         # it has processed the response.
 
-        # Must return an iterable of Request, dict or Item objects.
+        # Must return an iterable of Request, dictr Item objects.
         for i in result:
             yield i
 
@@ -54,3 +61,7 @@ class DemoSpiderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+    def process_request(self,request,spider):
+        agent=random.choice(agents)
+        request.headers['User-Agnet']=agent
