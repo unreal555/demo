@@ -27,3 +27,5 @@ class WorkInfo(scrapy.Item):
     jobCompany = scrapy.Field()
     jobType = scrapy.Field()
     jobSpesk = scrapy.Field()
+    jobUrl=scrapy.Field()
+    gongsiUrl=scrapy.Field()

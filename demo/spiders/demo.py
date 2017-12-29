@@ -1,7 +1,8 @@
 #!/bin/py
 #   -*-coding:utf-8-*-
 import scrapy
-import requests
+import random
+from demo.useragent import agents
 from demo.items import WorkInfo
 
 agent = 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.112 Safari/537.36'
@@ -11,9 +12,9 @@ agent = 'Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chr
 
 
 class demo(scrapy.Spider):
-#     headers = {
-#         'User-Agent': agent
-#     }
+    headers = {
+        'User-Agent': agent
+    }
     # cookie = {
     #     'user_trace_token': '20171227135143-047f5eea-eaca-11e7-9eaf-5254005c3644',
     #     'LGUID': '20171227135143-047f627c-eaca-11e7-9eaf-5254005c3644',
@@ -50,21 +51,26 @@ class demo(scrapy.Spider):
             info['work'] = work
             info['url'] = url
 
-            try:
-                print(info['url'], info['work'])
-                yield scrapy.Request(url=url[0] + '1',  headers=self.headers,
-                                     meta={"work": work}, callback=self.parse_url)
-
-            except:
-                pass
+            # try:
+            #     print(info['url'], info['work'])
+            #     yield scrapy.Request(url=url[0] + '1',  headers=self.headers,
+            #                          meta={"work": work}, callback=self.parse_url)
+            #     break
+            #
+            # except :
+            #     print("xxx")
+            #     pass
+            yield scrapy.Request(url=url[0] + '1',  headers=self.headers,
+                                                          meta={"work": work}, callback=self.parse_url)
+            break
 
     def parse_url(self, response):
-
-        print(response)
+        print(response.body)
         work = response.meta["work"]
 
         # print(title)
         for sel2 in response.xpath('//ul[@class="item_con_list"]/li'):
+            url=sel2.xpath('div/div/div/a').xpath('@href').extract()
             work = sel2.xpath('div/div/div/a/h3/text()').extract()
             jobPlace = sel2.xpath('div/div/div/a/span/em/text()').extract()
             jobMoney = sel2.xpath('div/div/div/div/span/text()').extract()
@@ -86,6 +92,9 @@ class demo(scrapy.Spider):
             Item["jobNeed"] = jobNeed
             Item["jobCompany"] = jobCompany
             Item["jobType"] = jobType
-            Item["jobSpesk"] = jobSpesk
 
+            Item["jobSpesk"] = jobSpesk
+            # print(url)
+            Item["jobUrl"]=url[0]
+            Item["gongsiUrl"]=url[1]
             yield Item
